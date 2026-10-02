@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lauren Muscle Mama</title>
+  <!-- Chart.js for Progress Graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #ff1493; /* Hot Pink */
+      --primary-hover: #e01283;
+      --bg: #ffffff;
+      --card-bg: #fff5f9;
+      --text: #2d3436;
+      --border: #f8bbd0;
+      --accent: #ff69b4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 80px;
+    }
+
+    header {
+      width: 100%;
+      background: #ffffff;
+      border-bottom: 2px solid var(--border);
+      padding: 16px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      color: var(--primary);
+      font-size: 1.5rem;
+      letter-spacing: 0.5px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: 16px;
+    }
+
+    /* Bottom Navigation Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #ffffff;
+      border-top: 2px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: #888;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Cards & Controls */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .exercise-meta {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .set-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .set-label {
+      width: 45px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .input-field {
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #ffffff;
+      text-align: center;
+      width: 65px;
+      font-size: 0.9rem;
+    }
+
+    .checkbox-btn {
+      appearance: none;
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--primary);
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .checkbox-btn:checked {
+      background-color: var(--primary);
+    }
+
+    .checkbox-btn:checked::after {
+      content: '✓';
+      color: white;
+      font-size: 20px;
+      position: absolute;
+      left: 7px;
+      top: 2px;
+    }
+
+    /* Timer Container */
+    .timer-container {
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .timer-display {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .btn {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    /* Metric Summary */
+    .metric-summary {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .metric-box {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 0 4px;
+    }
+
+    .metric-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .status-msg {
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Lauren Muscle Mama</h1>
+  </header>
+
+  <div class="container">
+    <!-- TAB 1: PROGRESS -->
+    <section id="tab-progress" class="tab-content active">
+      <div class="metric-summary">
+        <div class="metric-box">
+          <div id="stat-sessions" class="metric-value">0</div>
+          <div class="metric-label">Sessions Completed</div>
+        </div>
+        <div class="metric-box">
+          <div id="stat-total-volume" class="metric-value">0 lb</div>
+          <div class="metric-label">Last Total Weight Moved</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Total Weight Moved (Volume)</h2>
+        <canvas id="progressChart" width="400" height="250"></canvas>
+      </div>
+    </section>
+
+    <!-- TAB 2: TRAINING -->
+    <section id="tab-training" class="tab-content">
+      <!-- 90-Second Rest Timer -->
+      <div class="timer-container">
+        <div style="font-size: 0.85rem; color: #666;">Rest Timer</div>
+        <div id="timerDisplay" class="timer-display">01:30</div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 6px;">
+          <button class="btn" type="button" onclick="startTimer(90)">Start 90s</button>
+          <button class="btn btn-secondary" type="button" onclick="resetTimer()">Reset</button>
+        </div>
+      </div>
+
+      <!-- Workout Form -->
+      <form id="workout-form">
+        <!-- 1. Sit-to-Stands -->
+        <div class="card" data-exercise="Sit-to-Stands">
+          <h2>1. Sit-to-Stands</h2>
+          <div class="exercise-meta">
+            <span><strong>Target:</strong> 3 Sets × 10-12</span>
+            <span><strong>Seat / Bench Height:</strong> <input type="text" id="seat-height" class="input-field" style="width:75px; height:24px; padding:2px;" placeholder="e.g. 18 in"></span>
+            <span><strong>Tempo:</strong> 2-1-2-0</span>
+          </div>
+          <div class="set-rows" data-sets="3"></div>
+        </div>
+
+        <!-- 2. Romanian Deadlifts -->
+        <div class="card" data-exercise="Dumbbell RDL">
+          <h2>2. Dumbbell Romanian Deadlifts</h2>
+          <div class="exercise-meta">
+            <span><strong>Target:</strong> 3 Sets × 8-10</span>
+            <span><strong>Tempo:</strong> 3-0-1-0</span>
+          </div>
+          <div class="set-rows" data-sets="3"></div>
+        </div>
+
+        <!-- 3. Dumbbell Flat Bench Press -->
+        <div class="card" data-exercise="Dumbbell Flat Press">
+          <h2>3. Dumbbell Flat Bench Press</h2>
+          <div class="exercise-meta">
+            <span><strong>Target:</strong> 2 Sets × 8-10</span>
+            <span><strong>Bench Position:</strong> Flat</span>
+            <span><strong>Tempo:</strong> 2-1-1-0</span>
+          </div>
+          <div class="set-rows" data-sets="2"></div>
+        </div>
+
+        <!-- 4. Chest-Supported DB Row -->
+        <div class="card" data-exercise="Chest-Supported Row">
+          <h2>4. Chest-Supported DB Row</h2>
+          <div class="exercise-meta">
+            <span><strong>Target:</strong> 2 Sets × 10-12</span>
+            <span><strong>Bench Position:</strong> 30°-45° Incline</span>
+            <span><strong>Tempo:</strong> 2-0-1-1</span>
+          </div>
+          <div class="set-rows" data-sets="2"></div>
+        </div>
+
+        <!-- 5. Glute Bridges -->
+        <div class="card" data-exercise="Glute Bridge">
+          <h2>5. Glute Bridges</h2>
+          <div class="exercise-meta">
+            <span><strong>Target:</strong> 3 Sets × 12-15</span>
+            <span><strong>Tempo:</strong> 2-1-1-1</span>
+          </div>
+          <div class="set-rows" data-sets="3"></div>
+        </div>
+
+        <button type="button" class="btn" style="width: 100%; padding: 14px;" onclick="saveWorkout()">Complete & Log Workout</button>
+      </form>
+    </section>
+
+    <!-- TAB 3: BACKUP -->
+    <section id="tab-backup" class="tab-content">
+      <div class="card">
+        <h2>Google Drive Cloud Sync</h2>
+        <p style="font-size: 0.9rem; margin-bottom: 12px; color: #555;">Sync your records with Google Drive via Apps Script.</p>
+        <button class="btn" style="width: 100%; margin-bottom: 10px;" onclick="syncToDrive(true)">Sync Local Data to Drive</button>
+        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="pullFromDrive(true)">Pull Latest Data from Drive</button>
+        <div id="sync-status" class="status-msg"></div>
+      </div>
+
+      <div class="card">
+        <h2>Manual File Backup</h2>
+        <p style="font-size: 0.9rem; margin-bottom: 12px; color: #555;">Export or restore a local `.json` file backup.</p>
+        <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="exportData()">Download Backup (.json)</button>
+        <input type="file" id="importFile" accept=".json" style="margin-bottom: 10px; width: 100%;">
+        <button class="btn btn-secondary" style="width: 100%;" onclick="importData()">Import JSON File</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('tab-progress', this)">Progress</button>
+    <button class="tab-btn" onclick="switchTab('tab-training', this)">Training</button>
+    <button class="tab-btn" onclick="switchTab('tab-backup', this)">Backup</button>
+  </nav>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGhNuVWI2tVnSIGI0VkZjMBODWw7IDoPxUDcY0sEzgq336eEE3s83Zh4cjoj9DF6lM/exec";
+
+    // --- State Initialization ---
+    let appData = JSON.parse(localStorage.getItem('lauren_fitness_data')) || {
+      profile: { name: "Lauren", version: "1.0" },
+      logs: []
+    };
+
+    // --- Tab Navigation ---
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      el.classList.add('active');
+      if (tabId === 'tab-progress') renderProgress();
+    }
+
+    // --- Dynamic Set Input Generator ---
+    function renderExerciseRows() {
+      document.querySelectorAll('.set-rows').forEach(container => {
+        const count = parseInt(container.getAttribute('data-sets'), 10);
+        container.innerHTML = '';
+        for (let i = 1; i <= count; i++) {
+          container.innerHTML += `
+            <div class="set-row">
+              <span class="set-label">Set ${i}</span>
+              <input type="number" class="input-field set-wt" placeholder="lbs">
+              <input type="number" class="input-field set-reps" placeholder="reps">
+              <input type="checkbox" class="checkbox-btn" onchange="handleSetCheck(this)">
+            </div>
+          `;
+        }
+      });
+    }
+
+    // --- Timer Engine ---
+    let timerInterval = null;
+    function startTimer(duration) {
+      clearInterval(timerInterval);
+      let timeRemaining = duration;
+      const display = document.getElementById('timerDisplay');
+
+      const updateText = (s) => {
+        const mins = String(Math.floor(s / 60)).padStart(2, '0');
+        const secs = String(s % 60).padStart(2, '0');
+        display.innerText = `${mins}:${secs}`;
+      };
+
+      updateText(timeRemaining);
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining < 0) {
+          clearInterval(timerInterval);
+          display.innerText = "00:00";
+          return;
+        }
+        updateText(timeRemaining);
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('timerDisplay').innerText = "01:30";
+    }
+
+    function handleSetCheck(checkbox) {
+      if (checkbox.checked) {
+        startTimer(90);
+      }
+    }
+
+    // --- Save & Cloud Sync Workflow ---
+    async function saveWorkout() {
+      const session = {
+        date: new Date().toISOString().split('T')[0],
+        seatHeight: document.getElementById('seat-height').value || "Standard",
+        totalVolume: 0,
+        exercises: []
+      };
+
+      let totalSessionVolume = 0;
+
+      document.querySelectorAll('#workout-form .card').forEach(card => {
+        const exName = card.getAttribute('data-exercise');
+        const sets = [];
+
+        card.querySelectorAll('.set-row').forEach(row => {
+          const wt = parseFloat(row.querySelector('.set-wt').value) || 0;
+          const reps = parseFloat(row.querySelector('.set-reps').value) || 0;
+          const done = row.querySelector('.checkbox-btn').checked;
+
+          if (done) {
+            totalSessionVolume += (wt * reps);
+            sets.push({ wt, reps });
+          }
+        });
+
+        session.exercises.push({ exercise: exName, sets });
+      });
+
+      if (totalSessionVolume === 0) {
+        alert("Check off at least one completed set with weight & reps to log the session.");
+        return;
+      }
+
+      session.totalVolume = totalSessionVolume;
+      appData.logs.push(session);
+      localStorage.setItem('lauren_fitness_data', JSON.stringify(appData));
+
+      // Auto-sync to Google Drive in the background
+      syncToDrive(false);
+
+      alert("Workout logged successfully!");
+      document.getElementById('workout-form').reset();
+      resetTimer();
+      switchTab('tab-progress', document.querySelectorAll('.tab-btn')[0]);
+    }
+
+    // --- Google Drive API Handlers ---
+    async function syncToDrive(showNotification = true) {
+      const statusEl = document.getElementById('sync-status');
+      if (statusEl) statusEl.innerText = "Syncing to Drive...";
+      try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(appData),
+          headers: { "Content-Type": "text/plain;charset=utf-8" }
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          if (statusEl) statusEl.innerText = "Synced to Drive: " + new Date().toLocaleTimeString();
+          if (showNotification) alert("Synced to Google Drive successfully!");
+        } else {
+          if (statusEl) statusEl.innerText = "Sync failed.";
+          if (showNotification) alert("Sync error: " + result.message);
+        }
+      } catch (err) {
+        console.error(err);
+        if (statusEl) statusEl.innerText = "Offline / Sync failed.";
+        if (showNotification) alert("Unable to connect to Google Drive script.");
+      }
+    }
+
+    async function pullFromDrive(showNotification = true) {
+      const statusEl = document.getElementById('sync-status');
+      if (statusEl) statusEl.innerText = "Fetching from Drive...";
+      try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        const cloudData = await response.json();
+        if (cloudData.logs) {
+          appData = cloudData;
+          localStorage.setItem('lauren_fitness_data', JSON.stringify(appData));
+          renderProgress();
+          if (statusEl) statusEl.innerText = "Cloud data loaded: " + new Date().toLocaleTimeString();
+          if (showNotification) alert("Loaded data from Google Drive!");
+        }
+      } catch (err) {
+        console.error(err);
+        if (statusEl) statusEl.innerText = "Pull failed.";
+        if (showNotification) alert("Could not fetch data from Google Drive.");
+      }
+    }
+
+    // --- Progress & Chart Visualization ---
+    let chartInstance = null;
+
+    function renderProgress() {
+      const logs = appData.logs || [];
+      document.getElementById('stat-sessions').innerText = logs.length;
+
+      const lastVolume = logs.length > 0 ? logs[logs.length - 1].totalVolume : 0;
+      document.getElementById('stat-total-volume').innerText = `${lastVolume} lb`;
+
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      const labels = logs.map((l, idx) => `S${idx + 1} (${l.date})`);
+      const volumes = logs.map(l => l.totalVolume);
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Total Weight Moved (Volume in lbs)',
+            data: volumes,
+            borderColor: '#ff1493',
+            backgroundColor: 'rgba(255, 20, 147, 0.1)',
+            borderWidth: 2,
+            tension: 0.2,
+            fill: true,
+            pointBackgroundColor: '#ff1493',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f8bbd0' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // --- Manual File Backup Handlers ---
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `lauren_muscle_mama_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData() {
+      const fileInput = document.getElementById('importFile');
+      if (!fileInput.files.length) {
+        alert("Please select a file to import.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported.logs && Array.isArray(imported.logs)) {
+            appData = imported;
+            localStorage.setItem('lauren_fitness_data', JSON.stringify(appData));
+            renderProgress();
+            syncToDrive(false);
+            alert("Data imported and synced successfully!");
+          } else {
+            alert("Invalid backup file format.");
+          }
+        } catch (err) {
+          alert("Error parsing JSON file.");
+        }
+      };
+      reader.readAsText(fileInput.files[0]);
+    }
+
+    // --- On Load Lifecycle ---
+    window.onload = function() {
+      renderExerciseRows();
+      renderProgress();
+      // Silently sync latest from Drive on load
+      pullFromDrive(false);
+    };
+  </script>
+</body>
+</html>
