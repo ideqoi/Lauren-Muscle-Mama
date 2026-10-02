@@ -1,626 +1,658 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lauren Muscle Mama</title>
-  <!-- Chart.js for Progress Graphs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --primary: #ff1493; /* Hot Pink */
-      --primary-hover: #e01283;
-      --bg: #ffffff;
-      --card-bg: #fff5f9;
-      --text: #2d3436;
-      --border: #f8bbd0;
-      --accent: #ff69b4;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-bottom: 80px;
-    }
-
-    header {
-      width: 100%;
-      background: #ffffff;
-      border-bottom: 2px solid var(--border);
-      padding: 16px 20px;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    header h1 {
-      color: var(--primary);
-      font-size: 1.5rem;
-      letter-spacing: 0.5px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 600px;
-      padding: 16px;
-    }
-
-    /* Bottom Navigation Bar */
-    .tab-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: #ffffff;
-      border-top: 2px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .tab-btn {
-      background: none;
-      border: none;
-      color: #888;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .tab-btn.active {
-      color: var(--primary);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Cards & Controls */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .card h2 {
-      font-size: 1.15rem;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
-
-    .exercise-meta {
-      font-size: 0.8rem;
-      color: #666;
-      margin-bottom: 12px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .set-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .set-label {
-      width: 45px;
-      font-size: 0.85rem;
-      font-weight: bold;
-    }
-
-    .input-field {
-      padding: 8px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: #ffffff;
-      text-align: center;
-      width: 65px;
-      font-size: 0.9rem;
-    }
-
-    .checkbox-btn {
-      appearance: none;
-      width: 32px;
-      height: 32px;
-      border: 2px solid var(--primary);
-      border-radius: 6px;
-      background: white;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .checkbox-btn:checked {
-      background-color: var(--primary);
-    }
-
-    .checkbox-btn:checked::after {
-      content: '✓';
-      color: white;
-      font-size: 20px;
-      position: absolute;
-      left: 7px;
-      top: 2px;
-    }
-
-    /* Timer Container */
-    .timer-container {
-      background: #ffffff;
-      border: 2px solid var(--primary);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .timer-display {
-      font-size: 2rem;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
-    .btn {
-      background: var(--primary);
-      color: #ffffff;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: background 0.2s;
-    }
-
-    .btn:hover {
-      background: var(--primary-hover);
-    }
-
-    .btn-secondary {
-      background: #ffffff;
-      color: var(--primary);
-      border: 1px solid var(--primary);
-    }
-
-    /* Metric Summary */
-    .metric-summary {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .metric-box {
-      flex: 1;
-      text-align: center;
-      padding: 12px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 0 4px;
-    }
-
-    .metric-value {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
-    .metric-label {
-      font-size: 0.75rem;
-      color: #666;
-    }
-
-    .status-msg {
-      font-size: 0.85rem;
-      text-align: center;
-      margin-top: 8px;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Lauren Muscle Mama"/>
+<meta name="theme-color" content="#ffffff"/>
+<title>Lauren Muscle Mama</title>
+<style>
+:root{
+  --bg:#ffffff;--panel:#fff5f9;--panel2:#ffffff;--soft:#fce7f3;--line:#fbcfe8;
+  --text:#1f2937;--muted:#6b7280;--blue:#ff1493;--green:#10b981;--red:#ef4444;
+  --orange:#f59e0b;--purple:#ec4899;--cyan:#06b6d4;--pink:#ff1493;--chart-bg:#ffffff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;transition:background .2s,color .2s}
+header{position:sticky;top:0;z-index:10;background:#ffffff;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 14px 10px}
+.header-top{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:22px;margin:0;font-weight:900;letter-spacing:.2px;color:var(--pink)}
+.phase{font-size:13px;color:var(--muted);margin-top:3px}
+.sync-indicator{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);transition:all .3s}
+.sync-indicator.syncing{color:var(--orange);border-color:var(--orange)}
+.sync-indicator.synced{color:var(--pink);border-color:var(--pink)}
+.sync-indicator.error{color:var(--red);border-color:var(--red)}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin-top:12px;padding-bottom:3px}
+.tab{border:0;border-radius:12px;background:var(--soft);color:var(--text);padding:10px 14px;font-weight:800;white-space:nowrap;cursor:pointer}
+.tab.active{background:var(--pink);color:white}
+main{max-width:850px;margin:0 auto;padding:14px 14px 70px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:14px;box-shadow:0 4px 14px rgba(255,20,147,0.06)}
+h2{font-size:18px;margin:0 0 12px;color:var(--pink)}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat .label{font-size:12px;color:var(--muted)}.stat .value{font-size:24px;font-weight:950;margin-top:4px;color:var(--pink)}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px}
+input,select,textarea,button{width:100%;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);padding:11px;font-size:15px}
+button{background:var(--pink);border:0;font-weight:900;cursor:pointer;color:white}
+button.secondary{background:var(--soft);color:var(--text);border:1px solid var(--line)}
+button.danger{background:var(--red);color:white}
+button.pinkbtn{background:var(--pink);color:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.exercise{border:1px solid var(--line);border-radius:16px;margin:10px 0;background:var(--panel2);overflow:hidden}
+.exhead{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
+.exname{font-weight:950;color:var(--text)}.hint{font-size:12px;color:var(--muted)}
+.sets{padding:10px}
+.setrow{display:grid;grid-template-columns:0.85fr 1.1fr 0.9fr 0.7fr 0.7fr 0.7fr 0.55fr;gap:5px;align-items:end;margin-bottom:7px}
+.setrow span{font-size:11px;color:var(--muted);padding-bottom:8px;text-align:center}
+.done{background:#ff1493!important;color:#ffffff!important;border:1px solid #e01283!important}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}th{color:var(--pink)}
+.hidden{display:none}.tiny{font-size:12px;color:var(--muted);line-height:1.35}
+.timer{position:sticky;top:90px;z-index:8;margin:-4px -14px 14px;padding:12px;background:var(--pink);text-align:center;font-weight:950;color:white;box-shadow:0 6px 20px rgba(255,20,147,0.25)}
+.progressCanvas{width:100%;height:300px;background:var(--chart-bg);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
+.progressDetail{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:13px}
+.progressStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px;margin:10px 0}
+.miniStat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.miniStat .label{font-size:11px;color:var(--muted)}.miniStat .value{font-size:20px;font-weight:900;margin-top:3px;color:var(--pink)}
+.pr{display:inline-flex;align-items:center;border-radius:999px;padding:3px 7px;background:rgba(255,20,147,0.15);color:var(--pink);font-size:11px;font-weight:900;margin-left:6px}
+.exstats{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.35}
+</style>
 </head>
 <body>
+<header>
+  <div class="header-top">
+    <div>
+      <h1>Lauren Muscle Mama &#x1F48E;</h1>
+      <div class="phase">Weekly Full Body Strength &bull; 90s Rest Protocol</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="syncStatusBadge" class="sync-indicator synced">&#x2601;&#xFE0F; Synced</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('progress',this)">&#x1F4C8; Progress</button>
+    <button class="tab" onclick="showTab('train',this)">&#x1F3CB;&#xFE0F; Training</button>
+    <button class="tab" onclick="showTab('backup',this)">&#x2601;&#xFE0F; Backup</button>
+  </div>
+</header>
 
-  <header>
-    <h1>Lauren Muscle Mama</h1>
-  </header>
-
-  <div class="container">
-    <!-- TAB 1: PROGRESS -->
-    <section id="tab-progress" class="tab-content active">
-      <div class="metric-summary">
-        <div class="metric-box">
-          <div id="stat-sessions" class="metric-value">0</div>
-          <div class="metric-label">Sessions Completed</div>
-        </div>
-        <div class="metric-box">
-          <div id="stat-total-volume" class="metric-value">0 lb</div>
-          <div class="metric-label">Last Total Weight Moved</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Total Weight Moved (Volume)</h2>
-        <canvas id="progressChart" width="400" height="250"></canvas>
-      </div>
-    </section>
-
-    <!-- TAB 2: TRAINING -->
-    <section id="tab-training" class="tab-content">
-      <!-- 90-Second Rest Timer -->
-      <div class="timer-container">
-        <div style="font-size: 0.85rem; color: #666;">Rest Timer</div>
-        <div id="timerDisplay" class="timer-display">01:30</div>
-        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 6px;">
-          <button class="btn" type="button" onclick="startTimer(90)">Start 90s</button>
-          <button class="btn btn-secondary" type="button" onclick="resetTimer()">Reset</button>
-        </div>
-      </div>
-
-      <!-- Workout Form -->
-      <form id="workout-form">
-        <!-- 1. Sit-to-Stands -->
-        <div class="card" data-exercise="Sit-to-Stands">
-          <h2>1. Sit-to-Stands</h2>
-          <div class="exercise-meta">
-            <span><strong>Target:</strong> 3 Sets × 10-12</span>
-            <span><strong>Seat / Bench Height:</strong> <input type="text" id="seat-height" class="input-field" style="width:75px; height:24px; padding:2px;" placeholder="e.g. 18 in"></span>
-            <span><strong>Tempo:</strong> 2-1-2-0</span>
-          </div>
-          <div class="set-rows" data-sets="3"></div>
-        </div>
-
-        <!-- 2. Romanian Deadlifts -->
-        <div class="card" data-exercise="Dumbbell RDL">
-          <h2>2. Dumbbell Romanian Deadlifts</h2>
-          <div class="exercise-meta">
-            <span><strong>Target:</strong> 3 Sets × 8-10</span>
-            <span><strong>Tempo:</strong> 3-0-1-0</span>
-          </div>
-          <div class="set-rows" data-sets="3"></div>
-        </div>
-
-        <!-- 3. Dumbbell Flat Bench Press -->
-        <div class="card" data-exercise="Dumbbell Flat Press">
-          <h2>3. Dumbbell Flat Bench Press</h2>
-          <div class="exercise-meta">
-            <span><strong>Target:</strong> 2 Sets × 8-10</span>
-            <span><strong>Bench Position:</strong> Flat</span>
-            <span><strong>Tempo:</strong> 2-1-1-0</span>
-          </div>
-          <div class="set-rows" data-sets="2"></div>
-        </div>
-
-        <!-- 4. Chest-Supported DB Row -->
-        <div class="card" data-exercise="Chest-Supported Row">
-          <h2>4. Chest-Supported DB Row</h2>
-          <div class="exercise-meta">
-            <span><strong>Target:</strong> 2 Sets × 10-12</span>
-            <span><strong>Bench Position:</strong> 30°-45° Incline</span>
-            <span><strong>Tempo:</strong> 2-0-1-1</span>
-          </div>
-          <div class="set-rows" data-sets="2"></div>
-        </div>
-
-        <!-- 5. Glute Bridges -->
-        <div class="card" data-exercise="Glute Bridge">
-          <h2>5. Glute Bridges</h2>
-          <div class="exercise-meta">
-            <span><strong>Target:</strong> 3 Sets × 12-15</span>
-            <span><strong>Tempo:</strong> 2-1-1-1</span>
-          </div>
-          <div class="set-rows" data-sets="3"></div>
-        </div>
-
-        <button type="button" class="btn" style="width: 100%; padding: 14px;" onclick="saveWorkout()">Complete & Log Workout</button>
-      </form>
-    </section>
-
-    <!-- TAB 3: BACKUP -->
-    <section id="tab-backup" class="tab-content">
-      <div class="card">
-        <h2>Google Drive Cloud Sync</h2>
-        <p style="font-size: 0.9rem; margin-bottom: 12px; color: #555;">Sync your records with Google Drive via Apps Script.</p>
-        <button class="btn" style="width: 100%; margin-bottom: 10px;" onclick="syncToDrive(true)">Sync Local Data to Drive</button>
-        <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="pullFromDrive(true)">Pull Latest Data from Drive</button>
-        <div id="sync-status" class="status-msg"></div>
-      </div>
-
-      <div class="card">
-        <h2>Manual File Backup</h2>
-        <p style="font-size: 0.9rem; margin-bottom: 12px; color: #555;">Export or restore a local `.json` file backup.</p>
-        <button class="btn" style="width: 100%; margin-bottom: 12px;" onclick="exportData()">Download Backup (.json)</button>
-        <input type="file" id="importFile" accept=".json" style="margin-bottom: 10px; width: 100%;">
-        <button class="btn btn-secondary" style="width: 100%;" onclick="importData()">Import JSON File</button>
-      </div>
-    </section>
+<main>
+<!-- TAB 1: PROGRESS -->
+<section id="progress" class="screen">
+  <div class="card">
+    <h2>Overall Strength & Tonnage Progress</h2>
+    <div class="progressStats">
+      <div class="miniStat"><div class="label">Total Sessions</div><div class="value" id="pTotalSessions">0</div></div>
+      <div class="miniStat"><div class="label">Last Volume Moved</div><div class="value" id="pLastVolume">0 lb</div></div>
+      <div class="miniStat"><div class="label">All-Time Peak Volume</div><div class="value" id="pPeakVolume">0 lb</div></div>
+    </div>
+    <canvas id="progressTonnageChart" class="progressCanvas" width="850" height="320"></canvas>
+    <div id="progressTonnageDetail" class="progressDetail">Tap or click any session point to view exact tonnage moved.</div>
   </div>
 
-  <!-- Bottom Navigation -->
-  <nav class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('tab-progress', this)">Progress</button>
-    <button class="tab-btn" onclick="switchTab('tab-training', this)">Training</button>
-    <button class="tab-btn" onclick="switchTab('tab-backup', this)">Backup</button>
-  </nav>
+  <div class="card">
+    <h2>Recent Workouts</h2>
+    <table id="histTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Summary & Exercises Completed</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
 
-  <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGhNuVWI2tVnSIGI0VkZjMBODWw7IDoPxUDcY0sEzgq336eEE3s83Zh4cjoj9DF6lM/exec";
+<!-- TAB 2: TRAINING -->
+<section id="train" class="screen hidden">
+  <div id="timer" class="timer hidden" onclick="cancelTimer()" style="cursor:pointer">
+    Rest: <span id="timeLeft">90</span>s <small style="display:block;font-size:11px;font-weight:normal;opacity:0.9">(tap to skip)</small>
+  </div>
 
-    // --- State Initialization ---
-    let appData = JSON.parse(localStorage.getItem('lauren_fitness_data')) || {
-      profile: { name: "Lauren", version: "1.0" },
-      logs: []
-    };
+  <div class="card">
+    <h2>Weekly Full Body Workout</h2>
+    <div class="row">
+      <div><label>Date</label><input id="workDate" type="date"></div>
+      <div>
+        <label>Seat / Bench Height (Sit-to-Stands)</label>
+        <input id="seatHeight" type="text" placeholder="e.g. 18 in or Bench #4" oninput="autoSaveWorkoutDraft()">
+      </div>
+    </div>
 
-    // --- Tab Navigation ---
-    function switchTab(tabId, el) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      el.classList.add('active');
-      if (tabId === 'tab-progress') renderProgress();
+    <div id="workoutBox"></div>
+
+    <label>Session Notes</label>
+    <textarea id="workNotes" placeholder="Knee comfort, weights feeling good, notes..." oninput="autoSaveWorkoutDraft()"></textarea>
+    <button onclick="saveWorkout()" style="margin-top:10px">Finish Session & Force Sync</button>
+  </div>
+</section>
+
+<!-- TAB 3: BACKUP -->
+<section id="backup" class="screen hidden">
+  <div class="card">
+    <h2>Google Drive Cloud Sync</h2>
+    <div class="row" style="margin-bottom:10px">
+      <button class="pinkbtn" onclick="syncToGoogleDrive(false)">&#x2601;&#xFE0F; Force Sync to Google Drive</button>
+      <button class="secondary" onclick="restoreFromGoogleDrive()">&#x1F4E5; Restore from Google Drive</button>
+    </div>
+    <p class="tiny">Syncs your data directly to <code>lauren_data.json</code> on your Google Drive via your Apps Script endpoint. Automatic background sync triggers after each logged set.</p>
+  </div>
+
+  <div class="card">
+    <h2>Local File Backup</h2>
+    <div class="row" style="margin-bottom:8px">
+      <button class="secondary" onclick="downloadBackup()">Download Backup File (.json)</button>
+      <button class="secondary" onclick="importDataFromFile()">Restore from Local File</button>
+    </div>
+    <button class="danger" style="margin-top:10px" onclick="clearAll()">Clear Local Data</button>
+  </div>
+</section>
+</main>
+
+<script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGhNuVWI2tVnSIGI0VkZjMBODWw7IDoPxUDcY0sEzgq336eEE3s83Zh4cjoj9DF6lM/exec";
+
+/* 5 TAILORED FULL BODY EXERCISES */
+const workoutRoutine = [
+  {
+    name: "Sit-to-Stands",
+    target: "3 sets \u2022 10-12 reps \u2022 Knee-friendly quad & glute drive",
+    rest: 90,
+    sets: 3,
+    defaultTempo: 2,
+    defaultUp: 1,
+    defaultHold: 2
+  },
+  {
+    name: "Dumbbell Romanian Deadlift",
+    target: "3 sets \u2022 8-10 reps \u2022 Hamstring hinge & posture",
+    rest: 90,
+    sets: 3,
+    defaultTempo: 3,
+    defaultUp: 1,
+    defaultHold: 0
+  },
+  {
+    name: "Dumbbell Flat Bench Press",
+    target: "2 sets \u2022 8-10 reps \u2022 Bench Position: Flat",
+    rest: 90,
+    sets: 2,
+    defaultTempo: 2,
+    defaultUp: 1,
+    defaultHold: 1
+  },
+  {
+    name: "Chest-Supported DB Row",
+    target: "2 sets \u2022 10-12 reps \u2022 Bench Position: 30°-45° Incline",
+    rest: 90,
+    sets: 2,
+    defaultTempo: 2,
+    defaultUp: 1,
+    defaultHold: 1
+  },
+  {
+    name: "Glute Bridges",
+    target: "3 sets \u2022 12-15 reps \u2022 Floor setup \u2022 Peak lockout squeeze",
+    rest: 90,
+    sets: 3,
+    defaultTempo: 2,
+    defaultUp: 1,
+    defaultHold: 1
+  }
+];
+
+function today(){ return new Date().toISOString().slice(0,10); }
+document.getElementById("workDate").value = today();
+
+function data(){
+  const d = JSON.parse(localStorage.getItem("laurenFitnessData") || '{"workouts":[]}');
+  d.workouts = d.workouts || [];
+  return d;
+}
+
+function save(d){
+  localStorage.setItem("laurenFitnessData", JSON.stringify(d));
+  renderAll();
+  triggerAutoSync();
+}
+
+function showTab(id, btn){
+  document.querySelectorAll(".screen").forEach(s => s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  renderAll();
+}
+
+/* SYNC ENGINE */
+let syncDebounceTimer = null;
+function triggerAutoSync(){
+  const badge = document.getElementById("syncStatusBadge");
+  if(badge){
+    badge.textContent = "\u2601\uFE0F Syncing...";
+    badge.className = "sync-indicator syncing";
+  }
+  clearTimeout(syncDebounceTimer);
+  syncDebounceTimer = setTimeout(() => {
+    syncToGoogleDrive(true);
+  }, 1200);
+}
+
+async function syncToGoogleDrive(silent=false) {
+  const badge = document.getElementById("syncStatusBadge");
+  try {
+    const payload = JSON.stringify(data());
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: payload,
+      mode: "no-cors"
+    });
+    if(badge){
+      badge.textContent = "\u2601\uFE0F Saved";
+      badge.className = "sync-indicator synced";
     }
+    if(!silent) alert("\u2601\uFE0F Synced to Google Drive successfully!");
+  } catch (err) {
+    if(badge){
+      badge.textContent = "\u26A0\uFE0F Sync Error";
+      badge.className = "sync-indicator error";
+    }
+    if(!silent) alert("Sync error: " + err.message);
+  }
+}
 
-    // --- Dynamic Set Input Generator ---
-    function renderExerciseRows() {
-      document.querySelectorAll('.set-rows').forEach(container => {
-        const count = parseInt(container.getAttribute('data-sets'), 10);
-        container.innerHTML = '';
-        for (let i = 1; i <= count; i++) {
-          container.innerHTML += `
-            <div class="set-row">
-              <span class="set-label">Set ${i}</span>
-              <input type="number" class="input-field set-wt" placeholder="lbs">
-              <input type="number" class="input-field set-reps" placeholder="reps">
-              <input type="checkbox" class="checkbox-btn" onchange="handleSetCheck(this)">
+function restoreFromGoogleDrive() {
+  const scriptId = "drive_jsonp_loader";
+  const existing = document.getElementById(scriptId);
+  if (existing) existing.remove();
+
+  window.handleDriveRestore = function(remoteData) {
+    if (remoteData && remoteData.workouts) {
+      localStorage.setItem("laurenFitnessData", JSON.stringify(remoteData));
+      renderAll();
+      alert("\uD83D\uDCE5 Data restored from Google Drive successfully!");
+    } else {
+      alert("No valid backup found on Google Drive. Perform a sync first.");
+    }
+    const s = document.getElementById(scriptId);
+    if (s) s.remove();
+    delete window.handleDriveRestore;
+  };
+
+  const script = document.createElement("script");
+  script.id = scriptId;
+  script.src = `${GOOGLE_SCRIPT_URL}?callback=handleDriveRestore&t=${Date.now()}`;
+  script.onerror = function() {
+    alert("Could not connect to Google Drive. Check permissions on the web app.");
+  };
+  document.body.appendChild(script);
+}
+
+/* EXERCISE HISTORY & PR HELPERS */
+function baseExerciseName(name){
+  return String(name||"").trim();
+}
+
+function previousExerciseSets(exerciseName){
+  const d = data(), base = baseExerciseName(exerciseName);
+  const matches = [...d.workouts].sort((a,b) => b.date.localeCompare(a.date))
+    .map(w => (w.ex || []).find(e => baseExerciseName(e.name) === base))
+    .filter(Boolean);
+  return (matches[0] && Array.isArray(matches[0].sets)) ? matches[0].sets : [];
+}
+
+function exerciseHistory(name, allWorkouts){
+  const sets = [], base = baseExerciseName(name);
+  allWorkouts.forEach(w => (w.ex || []).filter(e => baseExerciseName(e.name) === base).forEach(e => (e.sets || []).forEach(s => {
+    const weight = numeric(s.weight ?? s.w), reps = numeric(s.reps ?? s.r);
+    if(weight !== null && reps !== null) sets.push({ weight, reps, date: w.date, score: weight * reps });
+  })));
+  sets.sort((a,b) => a.date.localeCompare(b.date));
+  return {
+    last: sets.at(-1) || null,
+    best: sets.length ? [...sets].sort((a,b) => b.score - a.score || b.weight - a.weight)[0] : null
+  };
+}
+
+function setDisplay(set){
+  if(!set) return "";
+  const w = set.weight ?? set.w ?? "", r = set.reps ?? set.r ?? "";
+  const t = set.tempo !== undefined && set.tempo !== "" ? ` (↓${set.tempo}s)` : "";
+  const u = set.up !== undefined && set.up !== "" ? ` [↑${set.up}s]` : "";
+  const h = set.hold !== undefined && set.hold !== "" ? ` [H:${set.hold}s]` : "";
+  if(w !== "" && r !== "") return `${w}\u00D7${r}${t}${u}${h}`;
+  if(w !== "") return `${w}`;
+  if(r !== "") return `${r}${t}${u}${h}`;
+  return "";
+}
+
+/* RENDER WORKOUT FORM */
+function renderWorkout(){
+  const box = document.getElementById("workoutBox");
+  box.innerHTML = "";
+
+  workoutRoutine.forEach((ex, i) => {
+    const prevSets = previousExerciseSets(ex.name);
+    const h = exerciseHistory(ex.name, data().workouts);
+    const lastSetText = prevSets.map(setDisplay).filter(Boolean).join(" \u2022 ");
+    const div = document.createElement("div");
+    div.className = "exercise";
+    div.innerHTML = `
+      <div class="exhead">
+        <div>
+          <div class="exname">${ex.name} <span id="pr_badge_${i}"></span></div>
+          <div class="hint">${ex.target}</div>
+          <div class="exstats">${lastSetText ? `Last Session: ${lastSetText}` : "First session on this exercise"}${h.best ? ` \u2022 Best set: ${h.best.weight} \u00D7${h.best.reps}` : ""}</div>
+        </div>
+        <button class="secondary" style="width:75px" onclick="startRest(${ex.rest})">${ex.rest}s</button>
+      </div>
+      <div class="sets">
+        <div class="setrow"><span>Set</span><span>Weight</span><span>Reps</span><span>Tempo</span><span>Up</span><span>Hold</span><span>Done</span></div>
+        ${Array.from({length: ex.sets}, (_, idx) => {
+          const n = idx + 1;
+          const p = prevSets[idx] || {};
+          const pw = p.weight ?? p.w ?? "", pr = p.reps ?? p.r ?? "";
+          const pt = p.tempo !== undefined && p.tempo !== "" ? p.tempo : ex.defaultTempo;
+          const pu = p.up !== undefined && p.up !== "" ? p.up : ex.defaultUp;
+          const ph = p.hold !== undefined && p.hold !== "" ? p.hold : ex.defaultHold;
+          return `
+            <div class="setrow">
+              <input value="Set ${n}" disabled style="text-align:center;padding:10px 2px;font-size:11px">
+              <input id="w_${i}_${n}" type="number" step="0.5" value="${pw}" placeholder="lb" oninput="checkPR(${i},'${ex.name}'); autoSaveWorkoutDraft()">
+              <input id="r_${i}_${n}" type="number" value="${pr}" placeholder="reps" oninput="checkPR(${i},'${ex.name}'); autoSaveWorkoutDraft()">
+              <input id="t_${i}_${n}" type="number" step="1" value="${pt}" placeholder="down" style="text-align:center" oninput="autoSaveWorkoutDraft()">
+              <input id="u_${i}_${n}" type="number" step="1" value="${pu}" placeholder="up" style="text-align:center" oninput="autoSaveWorkoutDraft()">
+              <input id="h_${i}_${n}" type="number" step="1" value="${ph}" placeholder="hold" style="text-align:center" oninput="autoSaveWorkoutDraft()">
+              <button class="secondary" onclick="handleSetDone(this, ${ex.rest}, ${i}, '${ex.name}')">&#x2713;</button>
             </div>
           `;
-        }
-      });
+        }).join("")}
+      </div>
+    `;
+    box.appendChild(div);
+    checkPR(i, ex.name);
+  });
+}
+
+function checkPR(exIndex, exName) {
+  const h = exerciseHistory(exName, data().workouts);
+  const badge = document.getElementById(`pr_badge_${exIndex}`);
+  if (!badge) return;
+  let currentBestScore = 0;
+  const numSets = workoutRoutine[exIndex].sets;
+  for (let n = 1; n <= numSets; n++) {
+    const w = numeric(val(`w_${exIndex}_${n}`));
+    const r = numeric(val(`r_${exIndex}_${n}`));
+    if (w !== null && r !== null && (w * r > currentBestScore)) currentBestScore = w * r;
+  }
+  if (h.best && currentBestScore > h.best.score && currentBestScore > 0) {
+    badge.innerHTML = `<span class="pr">&#x2B50; PR Set!</span>`;
+  } else badge.innerHTML = "";
+}
+
+function handleSetDone(btn, restSeconds, exIndex, exName) {
+  const isDone = btn.classList.toggle('done');
+  if (isDone) startRest(restSeconds);
+  checkPR(exIndex, exName);
+  autoSaveWorkoutDraft();
+}
+
+/* TIMER WITH BEEPS & SKIP */
+let timerInt = null, audioCtx = null;
+function playTimerBeep() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    const osc1 = audioCtx.createOscillator(), gain1 = audioCtx.createGain();
+    osc1.type = 'triangle'; osc1.frequency.setValueAtTime(880, now);
+    gain1.gain.setValueAtTime(0.95, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc1.connect(gain1); gain1.connect(audioCtx.destination);
+    osc1.start(now); osc1.stop(now + 0.3);
+  } catch(e){}
+}
+
+function startRest(seconds){
+  clearInterval(timerInt);
+  let t = seconds;
+  const timerEl = document.getElementById("timer");
+  timerEl.classList.remove("hidden");
+  document.getElementById("timeLeft").textContent = t;
+  timerInt = setInterval(() => {
+    t--; 
+    document.getElementById("timeLeft").textContent = t;
+    if(t <= 0){
+      clearInterval(timerInt); 
+      timerEl.classList.add("hidden");
+      playTimerBeep(); 
+      setTimeout(playTimerBeep, 400);
+      if (navigator.vibrate) navigator.vibrate([250, 100, 250, 100, 350]);
     }
+  }, 1000);
+}
 
-    // --- Timer Engine ---
-    let timerInterval = null;
-    function startTimer(duration) {
-      clearInterval(timerInterval);
-      let timeRemaining = duration;
-      const display = document.getElementById('timerDisplay');
+function cancelTimer() {
+  clearInterval(timerInt); 
+  document.getElementById("timer").classList.add("hidden");
+}
 
-      const updateText = (s) => {
-        const mins = String(Math.floor(s / 60)).padStart(2, '0');
-        const secs = String(s % 60).padStart(2, '0');
-        display.innerText = `${mins}:${secs}`;
-      };
+/* PERSISTENCE ENGINE */
+function autoSaveWorkoutDraft(){
+  const d = data(), curDate = val("workDate") || today();
+  let totalTonnage = 0;
 
-      updateText(timeRemaining);
-      timerInterval = setInterval(() => {
-        timeRemaining--;
-        if (timeRemaining < 0) {
-          clearInterval(timerInterval);
-          display.innerText = "00:00";
-          return;
-        }
-        updateText(timeRemaining);
-      }, 1000);
-    }
+  const ex = workoutRoutine.map((e, i) => {
+    const sets = Array.from({length: e.sets}, (_, idx) => {
+      const n = idx + 1;
+      const w = val(`w_${i}_${n}`), r = val(`r_${i}_${n}`), t = val(`t_${i}_${n}`), u = val(`u_${i}_${n}`), h = val(`h_${i}_${n}`);
+      if (numeric(w) && numeric(r)) totalTonnage += (numeric(w) * numeric(r));
+      return { weight: w, reps: r, tempo: t, up: u, hold: h };
+    }).filter(s => s.weight || s.reps);
 
-    function resetTimer() {
-      clearInterval(timerInterval);
-      document.getElementById('timerDisplay').innerText = "01:30";
-    }
+    return { name: e.name, sets };
+  });
 
-    function handleSetCheck(checkbox) {
-      if (checkbox.checked) {
-        startTimer(90);
+  const existingIdx = d.workouts.findIndex(w => w.date === curDate);
+  const wEntry = {
+    date: curDate,
+    type: "Full Body Circuit",
+    seatHeight: val("seatHeight") || "",
+    totalTonnage: Math.round(totalTonnage),
+    ex,
+    notes: val("workNotes")
+  };
+
+  if(existingIdx !== -1) d.workouts[existingIdx] = wEntry;
+  else d.workouts.push(wEntry);
+
+  save(d);
+}
+
+function saveWorkout(){
+  autoSaveWorkoutDraft();
+  alert("\u2705 Session finished and synced to Google Drive!");
+  showTab('progress', document.querySelectorAll('.tab')[0]);
+}
+
+/* PROGRESS VISUALIZATION & CHART ENGINE */
+function drawProgressTonnage(){
+  const c = document.getElementById("progressTonnageChart");
+  if(!c) return;
+  const ctx = c.getContext("2d"), d = data();
+  const sorted = [...d.workouts].filter(w => numeric(w.totalTonnage) !== null).sort((a,b) => a.date.localeCompare(b.date));
+  
+  ctx.clearRect(0, 0, c.width, c.height);
+
+  if(sorted.length < 1){
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "18px system-ui";
+    ctx.fillText("Log your first workout to generate progress charts", 35, 160);
+    c._points = [];
+    return;
+  }
+
+  const vals = sorted.map(x => numeric(x.totalTonnage));
+  const min = 0, max = Math.max(...vals, 100), pad = (max - min) * 0.15 || 10;
+  const lo = 0, hi = max + pad;
+  const L = 60, R = c.width - 30, T = 30, B = c.height - 45;
+  const X = i => L + i * ((R - L) / Math.max(1, sorted.length - 1));
+  const Y = v => B - ((v - lo) / (hi - lo)) * (B - T);
+
+  // Horizontal Grid Lines
+  ctx.strokeStyle = "#fbcfe8";
+  ctx.lineWidth = 1;
+  for(let i = 0; i < 5; i++){
+    const y = T + i * (B - T) / 4;
+    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(R, y); ctx.stroke();
+    const v = hi - i * (hi - lo) / 4;
+    ctx.fillStyle = "#6b7280"; ctx.font = "12px system-ui";
+    ctx.fillText(Math.round(v) + " lb", 8, y + 4);
+  }
+
+  // Pink Line Plot
+  ctx.strokeStyle = "#ff1493";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  sorted.forEach((p, i) => {
+    const x = sorted.length === 1 ? (L + R) / 2 : X(i);
+    const y = Y(numeric(p.totalTonnage));
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots
+  sorted.forEach((p, i) => {
+    const x = sorted.length === 1 ? (L + R) / 2 : X(i);
+    const y = Y(numeric(p.totalTonnage));
+    ctx.beginPath();
+    ctx.arc(x, y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "#ff1493";
+    ctx.fill();
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  c._points = sorted.map((p, i) => ({
+    x: sorted.length === 1 ? (L + R) / 2 : X(i),
+    date: p.date,
+    tonnage: numeric(p.totalTonnage)
+  }));
+}
+
+function nearestTonnagePoint(canvas, event){
+  const rect = canvas.getBoundingClientRect();
+  const px = (event.clientX - rect.left) * (canvas.width / rect.width);
+  const pts = canvas._points || [];
+  if(!pts.length) return null;
+  return pts.reduce((a,b) => Math.abs(b.x - px) < Math.abs(a.x - px) ? b : a, pts[0]);
+}
+
+function attachProgressInteractions(){
+  const c = document.getElementById("progressTonnageChart");
+  if(c && !c.dataset.bound){
+    c.addEventListener("click", e => {
+      const p = nearestTonnagePoint(c, e);
+      if(p){
+        document.getElementById("progressTonnageDetail").textContent = `Date: ${p.date} \u2022 Total Weight Moved: ${p.tonnage.toLocaleString()} lb`;
       }
-    }
+    });
+    c.dataset.bound = "1";
+  }
+}
 
-    // --- Save & Cloud Sync Workflow ---
-    async function saveWorkout() {
-      const session = {
-        date: new Date().toISOString().split('T')[0],
-        seatHeight: document.getElementById('seat-height').value || "Standard",
-        totalVolume: 0,
-        exercises: []
-      };
+function renderProgress(){
+  const d = data();
+  const workouts = [...d.workouts].sort((a,b) => a.date.localeCompare(b.date));
+  const totalSessions = workouts.length;
+  const lastVolume = totalSessions ? (workouts.at(-1).totalTonnage || 0) : 0;
+  const peakVolume = totalSessions ? Math.max(...workouts.map(w => numeric(w.totalTonnage) || 0)) : 0;
 
-      let totalSessionVolume = 0;
+  document.getElementById("pTotalSessions").textContent = totalSessions;
+  document.getElementById("pLastVolume").textContent = `${lastVolume.toLocaleString()} lb`;
+  document.getElementById("pPeakVolume").textContent = `${peakVolume.toLocaleString()} lb`;
 
-      document.querySelectorAll('#workout-form .card').forEach(card => {
-        const exName = card.getAttribute('data-exercise');
-        const sets = [];
+  drawProgressTonnage();
+  attachProgressInteractions();
+}
 
-        card.querySelectorAll('.set-row').forEach(row => {
-          const wt = parseFloat(row.querySelector('.set-wt').value) || 0;
-          const reps = parseFloat(row.querySelector('.set-reps').value) || 0;
-          const done = row.querySelector('.checkbox-btn').checked;
+function renderHistory(){
+  const d = data(), tb = document.querySelector("#histTable tbody");
+  tb.innerHTML = "";
+  const sorted = [...d.workouts].sort((a,b) => b.date.localeCompare(a.date));
 
-          if (done) {
-            totalSessionVolume += (wt * reps);
-            sets.push({ wt, reps });
-          }
-        });
+  if(!sorted.length){
+    tb.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:14px">No workouts recorded yet.</td></tr>`;
+    return;
+  }
 
-        session.exercises.push({ exercise: exName, sets });
-      });
+  sorted.forEach(w => {
+    const summary = (w.ex || []).map(e => {
+      const sets = (e.sets || []).map(s => {
+        const wt = s.weight ?? s.w ?? "", rp = s.reps ?? s.r ?? "";
+        return `${wt}\u00D7${rp}`;
+      }).filter(Boolean).join(", ");
+      return `<b>${e.name}:</b> ${sets || "No completed sets"}`;
+    }).join("<br>");
 
-      if (totalSessionVolume === 0) {
-        alert("Check off at least one completed set with weight & reps to log the session.");
-        return;
-      }
+    const meta = `<strong>${w.totalTonnage ? w.totalTonnage.toLocaleString() + ' lb moved' : ''}</strong>${w.seatHeight ? ' &bull; Seat: ' + w.seatHeight : ''}`;
+    tb.innerHTML += `
+      <tr>
+        <td style="white-space:nowrap">${w.date}</td>
+        <td>${meta}<br>${summary}</td>
+        <td>${w.notes || "--"}</td>
+      </tr>
+    `;
+  });
+}
 
-      session.totalVolume = totalSessionVolume;
-      appData.logs.push(session);
-      localStorage.setItem('lauren_fitness_data', JSON.stringify(appData));
+/* BACKUP & RESTORE TOOLS */
+function downloadBackup(){
+  const blob = new Blob([JSON.stringify(data(), null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `lauren_muscle_mama_backup_${today()}.json`;
+  a.click();
+}
 
-      // Auto-sync to Google Drive in the background
-      syncToDrive(false);
+function importDataFromFile(){
+  const input = document.createElement("input");
+  input.type = "file"; input.accept = ".json,application/json";
+  input.onchange = async () => {
+    const file = input.files[0]; if(!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if(!parsed.workouts){ alert("Invalid backup structure."); return; }
+      localStorage.setItem("laurenFitnessData", JSON.stringify(parsed));
+      renderAll();
+      alert("\uD83D\uDCE5 Backup imported successfully!");
+    } catch(e){ alert("Could not parse file."); }
+  };
+  input.click();
+}
 
-      alert("Workout logged successfully!");
-      document.getElementById('workout-form').reset();
-      resetTimer();
-      switchTab('tab-progress', document.querySelectorAll('.tab-btn')[0]);
-    }
+function clearAll(){
+  if(confirm("Clear all recorded workouts? Download a backup file first if needed.")){
+    localStorage.removeItem("laurenFitnessData");
+    renderAll();
+  }
+}
 
-    // --- Google Drive API Handlers ---
-    async function syncToDrive(showNotification = true) {
-      const statusEl = document.getElementById('sync-status');
-      if (statusEl) statusEl.innerText = "Syncing to Drive...";
-      try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(appData),
-          headers: { "Content-Type": "text/plain;charset=utf-8" }
-        });
-        const result = await response.json();
-        if (result.status === "success") {
-          if (statusEl) statusEl.innerText = "Synced to Drive: " + new Date().toLocaleTimeString();
-          if (showNotification) alert("Synced to Google Drive successfully!");
-        } else {
-          if (statusEl) statusEl.innerText = "Sync failed.";
-          if (showNotification) alert("Sync error: " + result.message);
-        }
-      } catch (err) {
-        console.error(err);
-        if (statusEl) statusEl.innerText = "Offline / Sync failed.";
-        if (showNotification) alert("Unable to connect to Google Drive script.");
-      }
-    }
+function numeric(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : null; }
+function val(id){ return document.getElementById(id).value; }
 
-    async function pullFromDrive(showNotification = true) {
-      const statusEl = document.getElementById('sync-status');
-      if (statusEl) statusEl.innerText = "Fetching from Drive...";
-      try {
-        const response = await fetch(APPS_SCRIPT_URL);
-        const cloudData = await response.json();
-        if (cloudData.logs) {
-          appData = cloudData;
-          localStorage.setItem('lauren_fitness_data', JSON.stringify(appData));
-          renderProgress();
-          if (statusEl) statusEl.innerText = "Cloud data loaded: " + new Date().toLocaleTimeString();
-          if (showNotification) alert("Loaded data from Google Drive!");
-        }
-      } catch (err) {
-        console.error(err);
-        if (statusEl) statusEl.innerText = "Pull failed.";
-        if (showNotification) alert("Could not fetch data from Google Drive.");
-      }
-    }
+function renderAll(){
+  renderWorkout();
+  renderProgress();
+  renderHistory();
+}
 
-    // --- Progress & Chart Visualization ---
-    let chartInstance = null;
-
-    function renderProgress() {
-      const logs = appData.logs || [];
-      document.getElementById('stat-sessions').innerText = logs.length;
-
-      const lastVolume = logs.length > 0 ? logs[logs.length - 1].totalVolume : 0;
-      document.getElementById('stat-total-volume').innerText = `${lastVolume} lb`;
-
-      const ctx = document.getElementById('progressChart').getContext('2d');
-      const labels = logs.map((l, idx) => `S${idx + 1} (${l.date})`);
-      const volumes = logs.map(l => l.totalVolume);
-
-      if (chartInstance) chartInstance.destroy();
-
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Total Weight Moved (Volume in lbs)',
-            data: volumes,
-            borderColor: '#ff1493',
-            backgroundColor: 'rgba(255, 20, 147, 0.1)',
-            borderWidth: 2,
-            tension: 0.2,
-            fill: true,
-            pointBackgroundColor: '#ff1493',
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: '#f8bbd0' }
-            },
-            x: {
-              grid: { display: false }
-            }
-          }
-        }
-      });
-    }
-
-    // --- Manual File Backup Handlers ---
-    function exportData() {
-      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `lauren_muscle_mama_backup_${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importData() {
-      const fileInput = document.getElementById('importFile');
-      if (!fileInput.files.length) {
-        alert("Please select a file to import.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (imported.logs && Array.isArray(imported.logs)) {
-            appData = imported;
-            localStorage.setItem('lauren_fitness_data', JSON.stringify(appData));
-            renderProgress();
-            syncToDrive(false);
-            alert("Data imported and synced successfully!");
-          } else {
-            alert("Invalid backup file format.");
-          }
-        } catch (err) {
-          alert("Error parsing JSON file.");
-        }
-      };
-      reader.readAsText(fileInput.files[0]);
-    }
-
-    // --- On Load Lifecycle ---
-    window.onload = function() {
-      renderExerciseRows();
-      renderProgress();
-      // Silently sync latest from Drive on load
-      pullFromDrive(false);
-    };
-  </script>
+// Startup execution
+renderAll();
+</script>
 </body>
 </html>
