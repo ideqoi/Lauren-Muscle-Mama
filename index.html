@@ -49,7 +49,7 @@ button.pinkbtn{background:var(--pink);color:#fff}
 .setrow span{font-size:11px;color:var(--muted);padding-bottom:8px;text-align:center}
 .done{background:#ff1493!important;color:#ffffff!important;border:1px solid #e01283!important}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}th{color:var(--pink)}
-.hidden{display:none}.tiny{font-size:12px;color:var(--muted);line-height:1.35}
+.hidden{display:none !important}.tiny{font-size:12px;color:var(--muted);line-height:1.35}
 .timer{position:sticky;top:90px;z-index:8;margin:-4px -14px 14px;padding:12px;background:var(--pink);text-align:center;font-weight:950;color:white;box-shadow:0 6px 20px rgba(255,20,147,0.25)}
 .progressCanvas{width:100%;height:320px;background:var(--chart-bg);border:1px solid var(--line);border-radius:14px;padding:6px}
 .progressStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px;margin:10px 0}
@@ -59,20 +59,22 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px
 .exstats{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.35}
 
 /* MOTIVATION POPUP MODAL */
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
-.modal-box{background:#ffffff;border:3px solid var(--pink);border-radius:24px;padding:26px 20px;max-width:380px;width:100%;text-align:center;box-shadow:0 12px 35px rgba(255,20,147,0.28);animation:modalPop .25s ease-out}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.modal-overlay.hidden{display:none !important}
+.modal-box{background:#ffffff;border:3px solid var(--pink);border-radius:24px;padding:28px 22px;max-width:380px;width:100%;text-align:center;box-shadow:0 14px 40px rgba(255,20,147,0.32);animation:modalPop .25s ease-out}
 @keyframes modalPop{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
-.modal-message{color:#ff1493;font-size:21px;font-weight:950;line-height:1.45;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 20px 0;white-space:pre-line}
-.modal-btn{background:#ff1493;color:#ffffff;border:0;border-radius:14px;padding:13px 20px;font-size:16px;font-weight:900;cursor:pointer;width:100%;box-shadow:0 4px 12px rgba(255,20,147,0.35)}
+.modal-message{color:#ff1493;font-size:22px;font-weight:950;line-height:1.45;letter-spacing:0.5px;text-transform:uppercase;margin:0 0 22px 0;white-space:pre-line}
+.modal-btn{background:#ff1493;color:#ffffff;border:0;border-radius:14px;padding:14px 20px;font-size:17px;font-weight:950;cursor:pointer;width:100%;box-shadow:0 4px 14px rgba(255,20,147,0.35);transition:opacity 0.2s}
+.modal-btn:active{opacity:0.85}
 </style>
 </head>
 <body>
 
 <!-- MOTIVATION POPUP MODAL -->
-<div id="motivationModal" class="modal-overlay hidden">
+<div id="motivationModal" class="modal-overlay">
   <div class="modal-box">
     <p class="modal-message">YOU ARE STRONG!&#10;YOU ARE POWERFUL!&#10;YOU ARE FEARCE!&#10;&#10;I &#x1F49C; YOU!</p>
-    <button class="modal-btn" onclick="dismissMotivationModal()">LET'S CRUSH IT &#x1F4AA;</button>
+    <button type="button" class="modal-btn" onclick="dismissMotivationModal()">LET'S CRUSH IT &#x1F4AA;</button>
   </div>
 </div>
 
@@ -265,12 +267,18 @@ function showTab(id, btn){
 /* MODAL DISPLAY ENGINE */
 function showMotivationModal(){
   const modal = document.getElementById("motivationModal");
-  if(modal) modal.classList.remove("hidden");
+  if(modal){
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
+  }
 }
 
 function dismissMotivationModal(){
   const modal = document.getElementById("motivationModal");
-  if(modal) modal.classList.add("hidden");
+  if(modal){
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+  }
 }
 
 /* SYNC ENGINE */
@@ -695,7 +703,7 @@ function renderHistory(){
 /* BACKUP & RESTORE TOOLS */
 function downloadBackup(){
   const blob = new Blob([JSON.stringify(data(), null, 2)], { type: "application/json" });
-  a = document.createElement("a");
+  const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `lauren_muscle_mama_backup_${today()}.json`;
   a.click();
