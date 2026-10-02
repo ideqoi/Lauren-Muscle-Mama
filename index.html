@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="Lauren Muscle Mama"/>
 <meta name="theme-color" content="#ffffff"/>
 <title>Lauren Muscle Mama</title>
+<!-- Chart.js Engine -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
   --bg:#ffffff;--panel:#fff5f9;--panel2:#ffffff;--soft:#fce7f3;--line:#fbcfe8;
@@ -49,8 +51,7 @@ button.pinkbtn{background:var(--pink);color:#fff}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}th{color:var(--pink)}
 .hidden{display:none}.tiny{font-size:12px;color:var(--muted);line-height:1.35}
 .timer{position:sticky;top:90px;z-index:8;margin:-4px -14px 14px;padding:12px;background:var(--pink);text-align:center;font-weight:950;color:white;box-shadow:0 6px 20px rgba(255,20,147,0.25)}
-.progressCanvas{width:100%;height:300px;background:var(--chart-bg);border:1px solid var(--line);border-radius:14px;touch-action:manipulation}
-.progressDetail{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:13px}
+.progressCanvas{width:100%;height:320px;background:var(--chart-bg);border:1px solid var(--line);border-radius:14px;padding:6px}
 .progressStats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px;margin:10px 0}
 .miniStat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
 .miniStat .label{font-size:11px;color:var(--muted)}.miniStat .value{font-size:20px;font-weight:900;margin-top:3px;color:var(--pink)}
@@ -80,14 +81,28 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px
 <!-- TAB 1: PROGRESS -->
 <section id="progress" class="screen">
   <div class="card">
-    <h2>Overall Strength & Tonnage Progress</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <h2>Volume & Strength Progression</h2>
+      <div style="width:230px">
+        <select id="chartViewSelector" onchange="renderProgressChart()">
+          <option value="ALL">Show All Lines</option>
+          <option value="TOTAL">Combined Total Only</option>
+          <option value="Sit-to-Stands">Sit-to-Stands</option>
+          <option value="Dumbbell Romanian Deadlift">Dumbbell Romanian Deadlift</option>
+          <option value="Dumbbell Flat Bench Press">Dumbbell Flat Bench Press</option>
+          <option value="Chest-Supported DB Row">Chest-Supported DB Row</option>
+          <option value="Glute Bridges">Glute Bridges</option>
+        </select>
+      </div>
+    </div>
+
     <div class="progressStats">
       <div class="miniStat"><div class="label">Total Sessions</div><div class="value" id="pTotalSessions">0</div></div>
       <div class="miniStat"><div class="label">Last Volume Moved</div><div class="value" id="pLastVolume">0 lb</div></div>
       <div class="miniStat"><div class="label">All-Time Peak Volume</div><div class="value" id="pPeakVolume">0 lb</div></div>
     </div>
-    <canvas id="progressTonnageChart" class="progressCanvas" width="850" height="320"></canvas>
-    <div id="progressTonnageDetail" class="progressDetail">Tap or click any session point to view exact tonnage moved.</div>
+
+    <canvas id="progressTonnageChart" class="progressCanvas"></canvas>
   </div>
 
   <div class="card">
@@ -96,7 +111,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px
       <thead>
         <tr>
           <th>Date</th>
-          <th>Summary & Exercises Completed</th>
+          <th>Summary & Exercise Volumes</th>
           <th>Notes</th>
         </tr>
       </thead>
@@ -163,7 +178,8 @@ const workoutRoutine = [
     sets: 3,
     defaultTempo: 2,
     defaultUp: 1,
-    defaultHold: 2
+    defaultHold: 2,
+    color: "#ff007f"
   },
   {
     name: "Dumbbell Romanian Deadlift",
@@ -172,7 +188,8 @@ const workoutRoutine = [
     sets: 3,
     defaultTempo: 3,
     defaultUp: 1,
-    defaultHold: 0
+    defaultHold: 0,
+    color: "#8b5cf6"
   },
   {
     name: "Dumbbell Flat Bench Press",
@@ -181,7 +198,8 @@ const workoutRoutine = [
     sets: 2,
     defaultTempo: 2,
     defaultUp: 1,
-    defaultHold: 1
+    defaultHold: 1,
+    color: "#06b6d4"
   },
   {
     name: "Chest-Supported DB Row",
@@ -190,7 +208,8 @@ const workoutRoutine = [
     sets: 2,
     defaultTempo: 2,
     defaultUp: 1,
-    defaultHold: 1
+    defaultHold: 1,
+    color: "#f59e0b"
   },
   {
     name: "Glute Bridges",
@@ -199,7 +218,8 @@ const workoutRoutine = [
     sets: 3,
     defaultTempo: 2,
     defaultUp: 1,
-    defaultHold: 1
+    defaultHold: 1,
+    color: "#10b981"
   }
 ];
 
@@ -443,16 +463,23 @@ function cancelTimer() {
 function autoSaveWorkoutDraft(){
   const d = data(), curDate = val("workDate") || today();
   let totalTonnage = 0;
+  const exerciseVolumes = {};
 
   const ex = workoutRoutine.map((e, i) => {
+    let exTonnage = 0;
     const sets = Array.from({length: e.sets}, (_, idx) => {
       const n = idx + 1;
       const w = val(`w_${i}_${n}`), r = val(`r_${i}_${n}`), t = val(`t_${i}_${n}`), u = val(`u_${i}_${n}`), h = val(`h_${i}_${n}`);
-      if (numeric(w) && numeric(r)) totalTonnage += (numeric(w) * numeric(r));
+      if (numeric(w) && numeric(r)) {
+        const setVolume = numeric(w) * numeric(r);
+        exTonnage += setVolume;
+        totalTonnage += setVolume;
+      }
       return { weight: w, reps: r, tempo: t, up: u, hold: h };
     }).filter(s => s.weight || s.reps);
 
-    return { name: e.name, sets };
+    exerciseVolumes[e.name] = Math.round(exTonnage);
+    return { name: e.name, volume: Math.round(exTonnage), sets };
   });
 
   const existingIdx = d.workouts.findIndex(w => w.date === curDate);
@@ -461,6 +488,7 @@ function autoSaveWorkoutDraft(){
     type: "Full Body Circuit",
     seatHeight: val("seatHeight") || "",
     totalTonnage: Math.round(totalTonnage),
+    exerciseVolumes,
     ex,
     notes: val("workNotes")
   };
@@ -477,91 +505,119 @@ function saveWorkout(){
   showTab('progress', document.querySelectorAll('.tab')[0]);
 }
 
-/* PROGRESS VISUALIZATION & CHART ENGINE */
-function drawProgressTonnage(){
-  const c = document.getElementById("progressTonnageChart");
-  if(!c) return;
-  const ctx = c.getContext("2d"), d = data();
-  const sorted = [...d.workouts].filter(w => numeric(w.totalTonnage) !== null).sort((a,b) => a.date.localeCompare(b.date));
-  
-  ctx.clearRect(0, 0, c.width, c.height);
+/* PROGRESS VISUALIZATION: CHART.JS MULTI-DATASET ENGINE */
+let progressChartInstance = null;
 
-  if(sorted.length < 1){
+function renderProgressChart(){
+  const canvas = document.getElementById("progressTonnageChart");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const d = data();
+  const sorted = [...d.workouts].sort((a,b) => a.date.localeCompare(b.date));
+
+  if(progressChartInstance) {
+    progressChartInstance.destroy();
+  }
+
+  if(sorted.length === 0){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#6b7280";
-    ctx.font = "18px system-ui";
-    ctx.fillText("Log your first workout to generate progress charts", 35, 160);
-    c._points = [];
+    ctx.font = "16px system-ui";
+    ctx.textAlign = "center";
+    ctx.fillText("Log your first workout to generate progress charts", canvas.width / 2, 140);
     return;
   }
 
-  const vals = sorted.map(x => numeric(x.totalTonnage));
-  const min = 0, max = Math.max(...vals, 100), pad = (max - min) * 0.15 || 10;
-  const lo = 0, hi = max + pad;
-  const L = 60, R = c.width - 30, T = 30, B = c.height - 45;
-  const X = i => L + i * ((R - L) / Math.max(1, sorted.length - 1));
-  const Y = v => B - ((v - lo) / (hi - lo)) * (B - T);
+  const labels = sorted.map((w, idx) => `S${idx + 1} (${w.date})`);
+  const selectedMode = document.getElementById("chartViewSelector") ? document.getElementById("chartViewSelector").value : "ALL";
 
-  // Horizontal Grid Lines
-  ctx.strokeStyle = "#fbcfe8";
-  ctx.lineWidth = 1;
-  for(let i = 0; i < 5; i++){
-    const y = T + i * (B - T) / 4;
-    ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(R, y); ctx.stroke();
-    const v = hi - i * (hi - lo) / 4;
-    ctx.fillStyle = "#6b7280"; ctx.font = "12px system-ui";
-    ctx.fillText(Math.round(v) + " lb", 8, y + 4);
-  }
+  const getExVolume = (w, name) => {
+    if(w.exerciseVolumes && w.exerciseVolumes[name] !== undefined) return w.exerciseVolumes[name];
+    const match = (w.ex || []).find(e => e.name === name);
+    if(!match) return 0;
+    if(match.volume !== undefined) return match.volume;
+    return (match.sets || []).reduce((acc, s) => acc + ((numeric(s.weight ?? s.w) || 0) * (numeric(s.reps ?? s.r) || 0)), 0);
+  };
 
-  // Pink Line Plot
-  ctx.strokeStyle = "#ff1493";
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  sorted.forEach((p, i) => {
-    const x = sorted.length === 1 ? (L + R) / 2 : X(i);
-    const y = Y(numeric(p.totalTonnage));
-    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
-  });
-  ctx.stroke();
+  const totalDataset = {
+    label: "Combined Total",
+    data: sorted.map(w => numeric(w.totalTonnage) || 0),
+    borderColor: "#ff1493",
+    backgroundColor: "rgba(255, 20, 147, 0.08)",
+    borderWidth: 3,
+    pointBackgroundColor: "#ff1493",
+    pointRadius: 4,
+    tension: 0.2,
+    fill: selectedMode === "TOTAL"
+  };
 
-  // Dots
-  sorted.forEach((p, i) => {
-    const x = sorted.length === 1 ? (L + R) / 2 : X(i);
-    const y = Y(numeric(p.totalTonnage));
-    ctx.beginPath();
-    ctx.arc(x, y, 6, 0, Math.PI * 2);
-    ctx.fillStyle = "#ff1493";
-    ctx.fill();
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
-
-  c._points = sorted.map((p, i) => ({
-    x: sorted.length === 1 ? (L + R) / 2 : X(i),
-    date: p.date,
-    tonnage: numeric(p.totalTonnage)
+  const exDatasets = workoutRoutine.map(ex => ({
+    label: ex.name,
+    data: sorted.map(w => getExVolume(w, ex.name)),
+    borderColor: ex.color,
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    pointBackgroundColor: ex.color,
+    pointRadius: 3.5,
+    tension: 0.2
   }));
-}
 
-function nearestTonnagePoint(canvas, event){
-  const rect = canvas.getBoundingClientRect();
-  const px = (event.clientX - rect.left) * (canvas.width / rect.width);
-  const pts = canvas._points || [];
-  if(!pts.length) return null;
-  return pts.reduce((a,b) => Math.abs(b.x - px) < Math.abs(a.x - px) ? b : a, pts[0]);
-}
-
-function attachProgressInteractions(){
-  const c = document.getElementById("progressTonnageChart");
-  if(c && !c.dataset.bound){
-    c.addEventListener("click", e => {
-      const p = nearestTonnagePoint(c, e);
-      if(p){
-        document.getElementById("progressTonnageDetail").textContent = `Date: ${p.date} \u2022 Total Weight Moved: ${p.tonnage.toLocaleString()} lb`;
-      }
-    });
-    c.dataset.bound = "1";
+  let activeDatasets = [];
+  if (selectedMode === "ALL") {
+    activeDatasets = [totalDataset, ...exDatasets];
+  } else if (selectedMode === "TOTAL") {
+    activeDatasets = [totalDataset];
+  } else {
+    activeDatasets = exDatasets.filter(ds => ds.label === selectedMode);
   }
+
+  progressChartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: activeDatasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: "bottom",
+          labels: {
+            boxWidth: 12,
+            font: { size: 11, family: "system-ui" },
+            color: "#374151"
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return ` ${context.dataset.label}: ${context.parsed.y.toLocaleString()} lb`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: "#fbcfe8" },
+          ticks: {
+            callback: value => `${value} lb`,
+            font: { size: 10 }
+          }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 10 } }
+        }
+      }
+    }
+  });
 }
 
 function renderProgress(){
@@ -575,8 +631,7 @@ function renderProgress(){
   document.getElementById("pLastVolume").textContent = `${lastVolume.toLocaleString()} lb`;
   document.getElementById("pPeakVolume").textContent = `${peakVolume.toLocaleString()} lb`;
 
-  drawProgressTonnage();
-  attachProgressInteractions();
+  renderProgressChart();
 }
 
 function renderHistory(){
@@ -595,10 +650,11 @@ function renderHistory(){
         const wt = s.weight ?? s.w ?? "", rp = s.reps ?? s.r ?? "";
         return `${wt}\u00D7${rp}`;
       }).filter(Boolean).join(", ");
-      return `<b>${e.name}:</b> ${sets || "No completed sets"}`;
+      const vol = e.volume !== undefined ? ` [${e.volume} lb]` : "";
+      return `<b>${e.name}${vol}:</b> ${sets || "No completed sets"}`;
     }).join("<br>");
 
-    const meta = `<strong>${w.totalTonnage ? w.totalTonnage.toLocaleString() + ' lb moved' : ''}</strong>${w.seatHeight ? ' &bull; Seat: ' + w.seatHeight : ''}`;
+    const meta = `<strong>${w.totalTonnage ? w.totalTonnage.toLocaleString() + ' lb total' : ''}</strong>${w.seatHeight ? ' &bull; Seat: ' + w.seatHeight : ''}`;
     tb.innerHTML += `
       <tr>
         <td style="white-space:nowrap">${w.date}</td>
@@ -651,7 +707,6 @@ function renderAll(){
   renderHistory();
 }
 
-// Startup execution
 renderAll();
 </script>
 </body>
