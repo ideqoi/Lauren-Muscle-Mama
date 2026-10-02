@@ -261,7 +261,10 @@ function showTab(id, btn){
   document.getElementById(id).classList.remove("hidden");
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   btn.classList.add("active");
-  renderAll();
+  if(id === "progress"){
+    renderProgress();
+    renderHistory();
+  }
 }
 
 /* MODAL DISPLAY ENGINE */
@@ -494,7 +497,7 @@ function cancelTimer() {
   document.getElementById("timer").classList.add("hidden");
 }
 
-/* PERSISTENCE ENGINE */
+/* PERSISTENCE ENGINE (Non-Destructive Auto-save) */
 function autoSaveWorkoutDraft(){
   const d = data(), curDate = val("workDate") || today();
   let totalTonnage = 0;
@@ -531,7 +534,9 @@ function autoSaveWorkoutDraft(){
   if(existingIdx !== -1) d.workouts[existingIdx] = wEntry;
   else d.workouts.push(wEntry);
 
-  save(d);
+  // Directly store & sync without destroying active DOM inputs
+  localStorage.setItem("laurenFitnessData", JSON.stringify(d));
+  triggerAutoSync();
 }
 
 function saveWorkout(){
