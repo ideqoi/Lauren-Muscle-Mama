@@ -707,7 +707,11 @@ function renderAll(){
   renderHistory();
 }
 
-renderAll();
+// App Startup Sequence & Welcome Alert
+window.addEventListener("DOMContentLoaded", () => {
+  renderAll();
+  alert("You are strong. You are powerful. I love you.");
+});
 </script>
 </body>
 </html>
